@@ -1,4 +1,8 @@
-const MyAccount = () => {
+import { useEffect, useState } from "react";
+
+const MyAccount = ({loggedInUserData}) => {
+
+
   return (
     <>
       <div className="container">
@@ -14,7 +18,7 @@ const MyAccount = () => {
                   type="text"
                   id="formName"
                   className="form-control"
-                  value="John Doe"
+                  value={loggedInUserData.name || ""}
                   readOnly
                 />
               </div>
@@ -29,7 +33,7 @@ const MyAccount = () => {
                   type="email"
                   id="formEmail"
                   className="form-control"
-                  value="johndoe@example.com"
+                  value={loggedInUserData.email || ""}
                   readOnly
                 />
               </div>
@@ -44,7 +48,7 @@ const MyAccount = () => {
                   type="text"
                   id="formUsername"
                   className="form-control"
-                  value="johndoe"
+                  value={loggedInUserData.username || ""}
                   readOnly
                 />
               </div>

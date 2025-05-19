@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const NavBar = () => {
+const NavBar = ({ cartItems, isAuthenticated, setUserLogout }) => {
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-light">
@@ -34,31 +34,37 @@ const NavBar = () => {
               <li className="nav-item">
                 <Link to="/cart" className="nav-link">
                   Cart
-                  <span className="badge pill bg-secondary">0</span>
+                  <span className="badge pill bg-secondary ms-1">
+                    {cartItems.length}
+                  </span>
                 </Link>
               </li>
 
-              <li className="nav-item">
-                <Link to="/my-account" className="nav-link">
-                  My Account
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link to="/my-orders" className="nav-link">
-                  My Orders
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link to="/" className="nav-link" >
-                  Logout
-                </Link>
-              </li>
-
-              <li className="nav-item">
-                <Link to="/login" className="nav-link">
-                  Login/Signup
-                </Link>
-              </li>
+              {isAuthenticated ? (
+                <>
+                  <li className="nav-item">
+                    <Link to="/my-account" className="nav-link">
+                      My Account
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/my-orders" className="nav-link">
+                      My Orders
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/" className="nav-link" onClick={setUserLogout}>
+                      Logout
+                    </Link>
+                  </li>
+                </>
+              ) : (
+                <li className="nav-item">
+                  <Link to="/login" className="nav-link">
+                    Login/Signup
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
         </div>

@@ -1,43 +1,29 @@
 import { useEffect, useState } from "react";
-import productImage from "../assets/washing-machine-2.jpg";
 import { useParams } from "react-router-dom";
 import { getSingleProductData } from "../Api";
+import { myStoreHook } from "./StoreContext";
 
-const SingleProduct = () => {
+const SingleProduct = ({setPageLoading, onAddToCart}) => {
+
+  const {renderProductPrice } = myStoreHook();
   const { id } = useParams();
   const [singleProduct, setSingleProduct] = useState({});
-  const [loading, setLoading] = useState(false)
+
 
   useEffect(() => {
     
     const fetchSingleProduct = async () => {
-      setLoading(true)
+      setPageLoading(true)
       const data = await getSingleProductData(id);
 
       setSingleProduct(data);
-      console.log(data);
-      setLoading(false)
+      setPageLoading(false)
     };
 
     fetchSingleProduct();
     
   }, [id]);
 
-  const renderProductPrice = (product) => {
-    if (product.sale_price) {
-      return (
-        <>
-          <span className="text-muted text-decoration-line-through me-2">
-            ${product.regular_price}
-          </span>
-          <span className="text-danger">${product.sale_price}</span>
-        </>
-      );
-    }
-    return <>${product.regular_price || product.price}</>;
-  };
-
-  if(loading) return <h2>Loading...</h2>
 
   return (
     <>
@@ -69,7 +55,7 @@ const SingleProduct = () => {
             <div className="mb-4">
               <h5>Category:  {singleProduct?.categories?.map((category) => category.name).join(",") }</h5>
             </div>
-            <button className="btn btn-primary mt-4" onclick="onAddToCart()">
+            <button className="btn btn-primary mt-4" onClick={() => onAddToCart(singleProduct)}>
               Add to Cart
             </button>
           </div>

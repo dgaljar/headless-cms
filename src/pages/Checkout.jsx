@@ -1,34 +1,62 @@
 import { useState } from "react";
+import { createAnOrder } from "../Api"
+import { toast } from "react-toastify";
+import { Navigate, useNavigate } from "react-router-dom";
 
-const Checkout = () => {
+const Checkout = ({clearCartItems, loggedInUserData}) => {
+  const navigate = useNavigate()
 
-    const [checkoutData, setCheckoutData] = useState({
-        firstname: "",
-        lastname: "",
-        address: "",
-        city: "",
-        state: "",
-        postcode: "",
-        country: "",
-        email: "",
-        phone: "",
-    })
+  const userData = loggedInUserData || {};
 
-    const handleOnChangeInput = (e) => {
-        const { name, value} = e.target
+  const [checkoutData, setCheckoutData] = useState({
+    customer_id: userData.id || "",
+    payment_method: "cod",
+    payment_method_title: "Cash on Delivery",
+    set_paid: false,
+    billing: {
+      first_name: "",
+      last_name: "",
+      address_1: "",
+      address_2: "",
+      city: "",
+      state: "",
+      postcode: "",
+      country: "",
+      email: userData.email || "",
+      phone: "",
+    },
+  });
 
-        setCheckoutData((prevFormData) => ({
-            ...prevFormData,
-            [name] : value
-        }) )
+  const handleOnChangeInput = (e) => {
+    const { name, value } = e.target;
 
+    setCheckoutData((prevFormData) => ({
+      ...prevFormData,
+      billing: {
+        ...prevFormData.billing,
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleCheckoutSubmit = (e) => {
+    try {
+
+      e.preventDefault();
+
+      createAnOrder(checkoutData).then(() => {
+        
+        toast.success("Order has been placed")
+      })
+
+      clearCartItems()
+
+      navigate('/products')
+    } catch (error) {
+      console.log(error);
+    } finally {
     }
-
-    const handleCheckoutSubmit = (e) => {
-        e.preventDefault()
-
-        console.log(checkoutData)
-    } 
+  };
 
   return (
     <>
@@ -43,9 +71,9 @@ const Checkout = () => {
               <input
                 type="text"
                 className="form-control"
-                name="firstname"
+                name="first_name"
                 onChange={handleOnChangeInput}
-                value={checkoutData.firstname}
+                value={checkoutData.billing.first_name}
               />
             </div>
             <div className="col-12 col-md-6">
@@ -55,9 +83,9 @@ const Checkout = () => {
               <input
                 type="text"
                 className="form-control"
-                name="lastname"
+                name="last_name"
                 onChange={handleOnChangeInput}
-                value={checkoutData.lastname}
+                value={checkoutData.billing.last_name}
               />
             </div>
           </div>
@@ -69,9 +97,9 @@ const Checkout = () => {
               <input
                 type="text"
                 className="form-control"
-                name="address"
+                name="address_1"
                 onChange={handleOnChangeInput}
-                value={checkoutData.address}
+                value={checkoutData.billing.address_1}
               />
             </div>
             <div className="col-12 col-md-6">
@@ -83,7 +111,7 @@ const Checkout = () => {
                 className="form-control"
                 name="city"
                 onChange={handleOnChangeInput}
-                value={checkoutData.city}
+                value={checkoutData.billing.city}
               />
             </div>
           </div>
@@ -97,7 +125,7 @@ const Checkout = () => {
                 className="form-control"
                 name="state"
                 onChange={handleOnChangeInput}
-                value={checkoutData.state}
+                value={checkoutData.billing.state}
               />
             </div>
             <div className="col-12 col-md-6">
@@ -109,7 +137,7 @@ const Checkout = () => {
                 className="form-control"
                 name="postcode"
                 onChange={handleOnChangeInput}
-                value={checkoutData.postcode}
+                value={checkoutData.billing.postcode}
               />
             </div>
           </div>
@@ -123,7 +151,7 @@ const Checkout = () => {
                 className="form-control"
                 name="country"
                 onChange={handleOnChangeInput}
-                value={checkoutData.country}
+                value={checkoutData.billing.country}
               />
             </div>
             <div className="col-12 col-md-6">
@@ -135,7 +163,7 @@ const Checkout = () => {
                 className="form-control"
                 name="email"
                 onChange={handleOnChangeInput}
-                value={checkoutData.email}
+                value={checkoutData.billing.email}
               />
             </div>
           </div>
@@ -144,13 +172,13 @@ const Checkout = () => {
               <label htmlFor="phone" className="form-label">
                 Phone:
               </label>
-              <input 
-              type="text" 
-              className="form-control" 
-              name="phone"
-              onChange={handleOnChangeInput}
-              value={checkoutData.phone}
-               />
+              <input
+                type="text"
+                className="form-control"
+                name="phone"
+                onChange={handleOnChangeInput}
+                value={checkoutData.billing.phone}
+              />
             </div>
           </div>
           <div className="text-center">

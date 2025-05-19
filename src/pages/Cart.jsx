@@ -2,37 +2,47 @@ import { useEffect, useState } from "react";
 import productImage from "../assets/washing-machine-2.jpg";
 import { useNavigate } from "react-router-dom";
 
-const Cart = () => {
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    setProducts([
-      {
-        image: "/src/assets/washing-machine-2.jpg",
-        title: "Product 1",
-        price: 40,
-        quantity: 2,
-      },
-      {
-        image: "/src/assets/washing-machine-2.jpg",
-        title: "Product 2",
-        price: 30,
-        quantity: 1,
-      },
-      {
-        image: "/src/assets/washing-machine-2.jpg",
-        title: "Product 3",
-        price: 50,
-        quantity: 3,
-      },
-    ]);
-  }, []);
-
-  const navigate = useNavigate()
+const Cart = ({ onRemoveProduct, cart, isAuthenticated }) => {
+  const [cartItems, setCartItems] = useState(cart);
+  const navigate = useNavigate();
 
   const goToCheckoutPage = () => {
-    navigate('/checkout')
-  }
+    if (isAuthenticated) {
+      navigate("/checkout");
+    } else {
+      navigate("/login");
+    }
+  };
+
+  useEffect(() => {
+    setCartItems(cart);
+  }, [cart]);
+
+  console.log(cart);
+
+  const renderProductPrice = (product) => {
+    if (product.sale_price) {
+      return (
+        <>
+          <span className="text-muted text-decoration-line-through me-2">
+            ${product.regular_price}
+          </span>
+          <span className="text-danger">${product.sale_price}</span>
+        </>
+      );
+    }
+    return <>${product.regular_price || product.price}</>;
+  };
+
+  const calculateTotalItemsPrice = () => {
+    return cartItems
+      .reduce((total, item) => {
+        const price = item.price ? parseFloat(item.price) : 0;
+        return total + price * item.quantity;
+      }, 0)
+      .toFixed(2);
+  };
+
   return (
     <>
       <div className="container">
@@ -44,26 +54,31 @@ const Cart = () => {
               <tr>
                 <th>Image</th>
                 <th>Product</th>
-                <th>Price</th>
+                <th>Unit Price</th>
                 <th>Quantity</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {products.map((product, index) => (
+              {cartItems.map((product, index) => (
                 <tr key={index}>
-                  <td>
+                  <td className="text-center">
                     <img
-                      src={product.image}
-                      alt="Product Name"
+                      src={product?.images[0]?.src}
+                      alt={product.name}
                       style={{ width: "50px" }}
                     />
                   </td>
-                  <td>{product.title}</td>
-                  <td>${product.price}</td>
-                  <td>{product.quantity}</td>
+                  <td>{product.name}</td>
+                  <td>{renderProductPrice(product)}</td>
+                  <td className="text-center">{product.quantity}</td>
                   <td>
-                    <button className="btn btn-danger">Remove</button>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => onRemoveProduct(product)}
+                    >
+                      Remove
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -71,16 +86,18 @@ const Cart = () => {
           </table>
           <div className="row align-items-center">
             <div className="col">
-              <h3>Total: $50.00</h3>
+              <h3>Total: ${calculateTotalItemsPrice()}</h3>
             </div>
             <div className="col text-end">
-              <button className="btn btn-success" onClick={goToCheckoutPage}>Checkout</button>
+              <button className="btn btn-success" onClick={goToCheckoutPage}>
+                Checkout
+              </button>
             </div>
           </div>
         </div>
 
         <div id="empty-cart-message">
-          <p>Your cart is empty.</p>
+          {cartItems.length > 0 ? "" : <p>Your cart is empty.</p>}
         </div>
       </div>
     </>

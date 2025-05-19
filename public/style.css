@@ -33,6 +33,10 @@ body {
   padding: 20px;
 }
 
+#root > nav + .container {
+  min-height: calc(100vh - 202px) !important;
+}
+
 /* Navbar */
 .navbar {
   background-color: #343a40;
